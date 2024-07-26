@@ -1,21 +1,20 @@
 <resources>
-    <!-- Base application theme -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
+      <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+          <item name="colorPrimary">@color/your_primary_color</item>
+          <item name="colorPrimaryDark">@color/your_primary_dark_color</item>
+          <item name="android:statusBarColor">@android:color/transparent</item>
+          <item name="android:windowTranslucentStatus">true</item>
+      </style>
+
+      <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
+          <item name="android:windowFullscreen">true</item>
+          <item name="android:windowNoTitle">true</item>
+          <item name="android:windowBackground">@android:color/white</item>
+      </style>
 
     <!-- Splash theme -->
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- You can customize the background color or other attributes for the splash screen -->
         <item name="android:background">@drawable/splash_image</item>
-    </style>
-
-    <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
-      <item name="android:windowFullscreen">true</item>
-      <item name="android:windowNoTitle">true</item>
-      <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>
