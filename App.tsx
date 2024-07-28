@@ -4,6 +4,7 @@ import SplashScreen from 'react-native-splash-screen';
 import { StatusBar, StyleSheet, View, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import { request, PERMISSIONS } from 'react-native-permissions';
+import firebase from '@react-native-firebase/app';
 
 const App = () => {
   useEffect(() => {
@@ -14,10 +15,13 @@ const App = () => {
 
   const requestPermissions = async () => {
     try {
-      const grantedBluetooth = await request(
+      const grantedBluetoothScan = await request(
         Platform.OS === 'ios'
-          ? PERMISSIONS.IOS.BLUETOOTH_ALWAYS
-          : PERMISSIONS.ANDROID.BLUETOOTH_ADMIN
+          ? PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL
+          : PERMISSIONS.ANDROID.BLUETOOTH_SCAN
+      );
+      const grantedBluetoothConnect = await request(
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT
       );
       const grantedLocation = await request(
         Platform.OS === 'ios'
@@ -50,7 +54,8 @@ const App = () => {
           : PERMISSIONS.ANDROID.POST_NOTIFICATIONS
       );
       console.log('Permissions granted:', {
-        grantedBluetooth,
+        grantedBluetoothScan,
+        grantedBluetoothConnect,
         grantedLocation,
         grantedCamera,
         grantedMicrophone,
@@ -63,39 +68,38 @@ const App = () => {
     }
   };
 
-  const configurePushNotifications = async () => {
-    // Request Notification Permissions
+  const configurePushNotifications = () => {
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('Notification caused app to open from background state:', remoteMessage.notification);
+    });
+
+    messaging().onMessage(async remoteMessage => {
+      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      showToast(remoteMessage);
+    });
+
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('Message handled in the background!', remoteMessage);
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log('Notification caused app to open from quit state:', remoteMessage.notification);
+        }
+      });
+
+    requestUserPermission();
+  };
+
+  const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
     if (enabled) {
-      const token = await messaging().getToken();
-      console.log('FCM Token:', token);
-
-      // Handle Notification when the app is in the foreground
-      messaging().onMessage(async remoteMessage => {
-        console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      });
-
-      // Handle Notification when the app is in background or killed
-      messaging().setBackgroundMessageHandler(async remoteMessage => {
-        console.log('Message handled in the background!', remoteMessage);
-      });
-
-      // Handle Notification when the app is opened from a quit state
-      messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log('Notification caused app to open from background state:', remoteMessage.notification);
-      });
-
-      messaging()
-        .getInitialNotification()
-        .then(remoteMessage => {
-          if (remoteMessage) {
-            console.log('Notification caused app to open from quit state:', remoteMessage.notification);
-          }
-        });
+      console.log('Notification permission granted.');
     } else {
       console.log('Notification permission denied');
     }
