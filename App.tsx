@@ -9,7 +9,7 @@ import firebase from '@react-native-firebase/app';
 const App = () => {
   useEffect(() => {
     SplashScreen.hide();
-    requestPermissions();
+    // requestPermissions();
     configurePushNotifications();
   }, []);
 
@@ -112,7 +112,11 @@ const App = () => {
         backgroundColor="rgba(0, 0, 0, 0.0)"
         barStyle="dark-content"
       />
-      <WebView source={{ uri: 'https://rabbithole.fm' }} style={styles.webview} />
+      <WebView source={{ uri: 'https://rabbithole.fm' }} style={styles.webview}
+        geolocationEnabled={true}
+        mediaPlaybackRequiresUserAction={false}
+        javaScriptEnabled={true} />
+
     </View>
   );
 };
